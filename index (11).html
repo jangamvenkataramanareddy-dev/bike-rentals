@@ -1,0 +1,1831 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIKE RENTALS — Nashik, Maharashtra</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#14243A',
+                        orange: {
+                            DEFAULT: '#FF6B35',
+                            hover: '#e55a24'
+                        },
+                        lightgrey: '#F4F6F8',
+                        darktext: '#202833',
+                        success: '#18865B',
+                        amber: '#D98B00',
+                        danger: '#D64545'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F4F6F8; color: #202833; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #F4F6F8; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between selection:bg-orange selection:text-white">
+
+    <!-- Toast Notification Modal / Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4"></div>
+
+    <!-- Custom Alert / Modal Container -->
+    <div id="custom-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+            <div id="modal-icon" class="w-12 h-12 rounded-full bg-orange/10 text-orange flex items-center justify-center text-xl mb-4 font-bold"></div>
+            <h3 id="modal-title" class="text-xl font-bold text-navy mb-2">Notification</h3>
+            <p id="modal-message" class="text-slate-600 text-sm leading-relaxed mb-6"></p>
+            <div id="modal-actions" class="flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition text-sm">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP NAVBAR -->
+    <header class="bg-navy text-white sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+            <!-- Brand -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="w-10 h-10 rounded-xl bg-orange flex items-center justify-center text-white text-xl font-extrabold shadow-lg">
+                    <i class="fa-solid fa-motorcycle"></i>
+                </div>
+                <div>
+                    <span class="text-lg sm:text-xl font-extrabold tracking-wider uppercase block leading-tight">BIKE RENTALS</span>
+                    <span class="text-xs text-slate-300 font-medium tracking-wide flex items-center gap-1">
+                        <i class="fa-solid fa-location-dot text-orange"></i> Nashik, Maharashtra
+                    </span>
+                </div>
+            </div>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+                <button onclick="switchTab('home')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-white/10 active-nav" data-tab="home">Home</button>
+                <button onclick="switchTab('explore')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-white/10" data-tab="explore">Explore Bikes</button>
+                <button onclick="switchTab('my-bookings')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-white/10" data-tab="my-bookings">My Bookings</button>
+                <button onclick="switchTab('support')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-white/10" data-tab="support">Support</button>
+                <button onclick="switchTab('policies')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-white/10" data-tab="policies">Policies</button>
+            </nav>
+
+            <!-- Right Actions -->
+            <div class="flex items-center space-x-3">
+                <a href="https://wa.me/919822000000?text=Hi%2C%20I%20want%20to%20rent%20a%20bike%20in%20Nashik" target="_blank" class="hidden sm:inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shadow">
+                    <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp
+                </a>
+                <button onclick="openAdminLoginModal()" id="admin-portal-btn" class="bg-orange hover:bg-orange-hover text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-lock text-xs"></i> <span id="admin-btn-text">Admin Portal</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow">
+
+        <!-- 1. HOME TAB -->
+        <div id="tab-home" class="tab-content active">
+            <!-- Hero Banner -->
+            <div class="relative bg-navy text-white overflow-hidden py-16 sm:py-24">
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#FF6B35_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 bg-orange/20 text-orange border border-orange/30 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold">
+                            <i class="fa-solid fa-star"></i> Nashik's Premier Bike Rental Fleet
+                        </div>
+                        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight">
+                            Your Ride. <span class="text-orange">Your Freedom.</span>
+                        </h1>
+                        <p class="text-slate-300 text-base sm:text-lg max-w-xl mx-auto lg:mx-0">
+                            Explore Nashik, Trimbakeshwar, and surrounding vineyards with our meticulously maintained fleet of 7 reliable bikes & scooters. Instant booking, transparent pricing, zero hassle.
+                        </p>
+                        <div class="flex flex-wrap justify-center lg:justify-start gap-4 pt-2">
+                            <button onclick="switchTab('explore')" class="bg-orange hover:bg-orange-hover text-white px-8 py-4 rounded-2xl font-bold text-base shadow-xl transition transform hover:-translate-y-0.5 flex items-center gap-3">
+                                Explore Bikes <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                            <a href="https://wa.me/919822000000?text=Hi%2C%20I%20have%20a%20query%20about%20bike%20rentals%20in%20Nashik" target="_blank" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-4 rounded-2xl font-semibold text-base transition flex items-center gap-2">
+                                <i class="fa-brands fa-whatsapp text-emerald-400 text-lg"></i> Quick WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Quick Search / Booking Widget Card -->
+                    <div class="lg:col-span-5 bg-white text-darktext p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-100">
+                        <h3 class="text-xl font-bold text-navy mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check text-orange"></i> Quick Booking Search
+                        </h3>
+                        <form onsubmit="handleQuickSearch(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Pickup Date & Time</label>
+                                <input type="datetime-local" id="search-pickup" required class="w-full bg-lightgrey border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Return Date & Time</label>
+                                <input type="datetime-local" id="search-return" required class="w-full bg-lightgrey border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Select Bike Model</label>
+                                <select id="search-bike-model" class="w-full bg-lightgrey border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                                    <option value="all">All Available Bikes (7 Models)</option>
+                                    <option value="TVS Star City">TVS Star City (2013)</option>
+                                    <option value="Suzuki Access 125">Suzuki Access 125 (2013)</option>
+                                    <option value="Honda Livo">Honda Livo (2017)</option>
+                                    <option value="Honda CB Twister">Honda CB Twister (2011)</option>
+                                    <option value="Hero Karizma ZMR">Hero Karizma ZMR (2011)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-navy hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                                Check Availability & Book <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features / How it works -->
+            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="text-center max-w-2xl mx-auto mb-12">
+                    <span class="text-orange font-bold text-sm tracking-widest uppercase">Simple & Transparent</span>
+                    <h2 class="text-3xl font-extrabold text-navy mt-1">How Bike Rentals Works</h2>
+                    <p class="text-slate-600 text-sm mt-2">Rent a bike in Nashik in 3 easy steps with zero complicated paperwork.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200/80 text-center hover:shadow-md transition">
+                        <div class="w-16 h-16 bg-orange/10 text-orange rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                            <i class="fa-solid fa-motorcycle"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-navy mb-2">1. Choose Your Bike</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Browse our 7 individual bikes & scooters with transparent daily, weekly, and monthly rates.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200/80 text-center hover:shadow-md transition">
+                        <div class="w-16 h-16 bg-orange/10 text-orange rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-navy mb-2">2. Quick Booking Request</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Enter your name and mobile number. No password or unnecessary personal documents needed online.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200/80 text-center hover:shadow-md transition">
+                        <div class="w-16 h-16 bg-orange/10 text-orange rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-navy mb-2">3. Pickup & Ride</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Get owner approval instantly, pay rental & optional security deposit at pickup in Nashik, and hit the road!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Featured Fleet Preview -->
+            <section class="bg-white py-16 border-t border-slate-200">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10">
+                        <div>
+                            <span class="text-orange font-bold text-sm tracking-widest uppercase">Our Fleet</span>
+                            <h2 class="text-3xl font-extrabold text-navy mt-1">7 Individually Managed Bikes</h2>
+                        </div>
+                        <button onclick="switchTab('explore')" class="mt-4 sm:mt-0 text-orange font-bold hover:underline flex items-center gap-2">
+                            View All Bikes & Rates <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div id="home-fleet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 2. EXPLORE BIKES TAB -->
+        <div id="tab-explore" class="tab-content py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-extrabold text-navy">Explore Our Fleet</h1>
+                    <p class="text-slate-600 text-sm mt-1">Choose from our 7 well-maintained bikes in Nashik. Each bike is managed independently with unique pricing and availability.</p>
+                </div>
+
+                <!-- Filters & Search -->
+                <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div class="w-full md:w-96 relative">
+                        <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                        <input type="text" id="fleet-search" oninput="filterFleet()" placeholder="Search by model, ID or color..." class="w-full pl-11 pr-4 py-3 bg-lightgrey rounded-xl text-sm font-medium focus:outline-none focus:border-orange border border-slate-200">
+                    </div>
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <select id="fleet-filter-type" onchange="filterFleet()" class="bg-lightgrey border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none">
+                            <option value="all">All Categories</option>
+                            <option value="Scooter">Scooters</option>
+                            <option value="Commuter">Commuters</option>
+                            <option value="Sports">Sports / Performance</option>
+                        </select>
+                        <select id="fleet-filter-status" onchange="filterFleet()" class="bg-lightgrey border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none">
+                            <option value="all">All Statuses</option>
+                            <option value="Available">Available Now</option>
+                            <option value="Rented">Currently Rented</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Fleet Grid -->
+                <div id="explore-fleet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. BIKE DETAILS TAB -->
+        <div id="tab-details" class="tab-content py-12">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" id="bike-details-container">
+                <!-- Dynamically populated based on selected bike -->
+            </div>
+        </div>
+
+        <!-- 4. BOOK A BIKE TAB -->
+        <div id="tab-book" class="tab-content py-12">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-10">
+                    <div class="flex items-center gap-3 mb-6 pb-6 border-b border-slate-100">
+                        <div class="w-12 h-12 rounded-2xl bg-orange/10 text-orange flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-file-signature"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-navy">Complete Booking Request</h2>
+                            <p class="text-slate-500 text-xs sm:text-sm">Submit your rental dates and contact details for instant admin review.</p>
+                        </div>
+                    </div>
+
+                    <form onsubmit="submitBookingRequest(event)" class="space-y-6">
+                        <input type="hidden" id="book-bike-id" value="">
+                        
+                        <!-- Selected Bike Card Preview -->
+                        <div id="booking-bike-preview" class="bg-lightgrey p-4 rounded-2xl flex items-center gap-4 border border-slate-200">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Full Name *</label>
+                                <input type="text" id="cust-name" required placeholder="e.g. Rahul Sharma" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Mobile Number *</label>
+                                <input type="tel" id="cust-mobile" required placeholder="10-digit mobile number" pattern="[0-9]{10}" title="Enter valid 10-digit mobile number" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                                <p class="text-[11px] text-slate-500 mt-1">Used for tracking booking status & return receipts.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Pickup Date & Time *</label>
+                                <input type="datetime-local" id="book-pickup" required onchange="calculateBookingEstimate()" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Mandatory Return Date & Time *</label>
+                                <input type="datetime-local" id="book-return" required onchange="calculateBookingEstimate()" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                            </div>
+                        </div>
+
+                        <!-- Estimate Box -->
+                        <div class="bg-navy/5 border border-navy/10 rounded-2xl p-5 space-y-3">
+                            <h4 class="font-bold text-navy text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-calculator text-orange"></i> Rental Estimate & Policies
+                            </h4>
+                            <div class="flex justify-between text-sm text-slate-600">
+                                <span>Duration:</span>
+                                <span id="est-duration" class="font-semibold text-navy">Select dates</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-slate-600">
+                                <span>Estimated Rental Charges:</span>
+                                <span id="est-amount" class="font-bold text-orange text-lg">₹0</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-slate-600">
+                                <span>Optional Security Deposit (Collected at pickup):</span>
+                                <span id="est-deposit" class="font-semibold text-navy">₹500 (Refundable)</span>
+                            </div>
+                            <p class="text-xs text-slate-500 pt-2 border-t border-slate-200">
+                                Note: No online payment required now. The owner will review your booking and approve based on schedule availability.
+                            </p>
+                        </div>
+
+                        <div class="flex gap-4 pt-2">
+                            <button type="button" onclick="switchTab('explore')" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-xl transition text-sm">Cancel</button>
+                            <button type="submit" class="w-2/3 bg-orange hover:bg-orange-hover text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
+                                Submit Booking Request <i class="fa-solid fa-check"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. MY BOOKINGS TAB -->
+        <div id="tab-my-bookings" class="tab-content py-12">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 mb-8">
+                    <h2 class="text-2xl font-extrabold text-navy mb-2">Track Your Bookings</h2>
+                    <p class="text-slate-600 text-sm mb-6">Enter your mobile number or Booking ID to check approval status, active rentals, and return QR receipts.</p>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="flex-grow relative">
+                            <i class="fa-solid fa-mobile-screen absolute left-4 top-3.5 text-slate-400"></i>
+                            <input type="text" id="track-query" placeholder="Enter Mobile Number or Booking ID (e.g. BRN-1001)" class="w-full pl-11 pr-4 py-3 bg-lightgrey rounded-xl text-sm font-medium border border-slate-300 focus:outline-none focus:border-orange">
+                        </div>
+                        <button onclick="searchMyBookings()" class="bg-navy hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-xl transition shadow text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-search"></i> Search Bookings
+                        </button>
+                    </div>
+                </div>
+
+                <div id="my-bookings-results" class="space-y-6">
+                    <!-- Populated dynamically or default list -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. CUSTOMER SUPPORT TAB -->
+        <div id="tab-support" class="tab-content py-12">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-10">
+                    <div class="flex items-center gap-3 mb-6 pb-6 border-b border-slate-100">
+                        <div class="w-12 h-12 rounded-2xl bg-orange/10 text-orange flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-navy">Customer Support & Inquiries</h2>
+                            <p class="text-slate-500 text-xs sm:text-sm">Have a question about bike availability, extensions, or Nashik routes? Contact us directly.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <a href="https://wa.me/919822000000?text=Hi%2C%20I%20need%20help%20with%20my%20bike%20rental." target="_blank" class="bg-emerald-50 border border-emerald-200 p-6 rounded-2xl flex items-center gap-4 hover:bg-emerald-100/50 transition">
+                            <div class="w-12 h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center text-2xl">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-navy text-base">WhatsApp Support</h4>
+                                <p class="text-xs text-slate-600 mt-0.5">+91 63022 40389</p>
+                            </div>
+                        </a>
+                        <div class="bg-orange/5 border border-orange/20 p-6 rounded-2xl flex items-center gap-4">
+                            <div class="w-12 h-12 bg-orange text-white rounded-xl flex items-center justify-center text-2xl">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-navy text-base">Nashik Hub Location</h4>
+                                <p class="text-xs text-slate-600 mt-0.5">Near KHARCHEE hostel, sandip university, nashik</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form onsubmit="submitSupportTicket(event)" class="space-y-4">
+                        <h3 class="font-bold text-navy text-lg">Send Us a Message</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Your Name *</label>
+                                <input type="text" id="sup-name" required class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Mobile Number *</label>
+                                <input type="tel" id="sup-mobile" required pattern="[0-9]{10}" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Message / Question *</label>
+                            <textarea id="sup-msg" rows="4" required placeholder="Type your inquiry here..." class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-orange hover:bg-orange-hover text-white font-bold py-3.5 rounded-xl transition shadow text-sm">
+                            Submit Support Ticket
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. POLICIES TAB -->
+        <div id="tab-policies" class="tab-content py-12">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-10 space-y-6">
+                    <h2 class="text-3xl font-extrabold text-navy">Rental Policies & Legal Notice</h2>
+                    
+                    <div class="bg-red-50 border border-red-200 p-5 rounded-2xl flex items-start gap-3">
+                        <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl mt-0.5"></i>
+                        <div>
+                            <h4 class="font-bold text-red-900 text-sm">Legal Reminder on Vehicle Registration</h4>
+                            <p class="text-xs text-red-700 mt-1 leading-relaxed">
+                                The fleet consists of privately registered vehicles in Nashik. Customers are advised to verify Maharashtra rental licensing, registration category, permits, and applicable RTO regulations before operating paid rentals on public highways. BIKE RENTALS provides vehicles on an as-is basis.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+                        <h3 class="font-bold text-navy text-lg">1. Rental Duration & Charges</h3>
+                        <p>Standard daily rate is ₹400 for 24 hours. Weekly package is ₹2,800 and monthly package is ₹12,000. Additional hourly billing is ₹100/hr for delays beyond scheduled return.</p>
+
+                        <h3 class="font-bold text-navy text-lg">2. Security Deposits</h3>
+                        <p>A fully refundable security deposit (default ₹500) is collected strictly at pickup in cash or UPI. Deposits are never counted as rental revenue and are refunded immediately upon safe return of the bike without damage.</p>
+
+                        <h3 class="font-bold text-navy text-lg">3. Cancellations & Modifications</h3>
+                        <p>Bookings can be cancelled free of charge prior to admin approval or pickup. Once issued, rental periods are binding.</p>
+
+                        <h3 class="font-bold text-navy text-lg">4. Customer Privacy</h3>
+                        <p>We collect only your full name and mobile number for booking identification and communication. No sensitive personal data or emails are stored.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. ADMIN PORTAL (PROTECTED) -->
+        <div id="tab-admin" class="tab-content">
+            <div id="admin-login-screen" class="max-w-md mx-auto px-4 py-20">
+                <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 p-8 text-center space-y-6">
+                    <div class="w-16 h-16 bg-navy text-orange rounded-2xl flex items-center justify-center text-3xl font-bold mx-auto shadow-lg">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-navy">Admin Portal Login</h2>
+                        <p class="text-slate-500 text-xs sm:text-sm mt-1">BIKE RENTALS Management System (Nashik)</p>
+                    </div>
+                    <form onsubmit="handleAdminLogin(event)" class="space-y-4 text-left">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Username</label>
+                            <input type="text" id="admin-user-input" required placeholder="ramana reddy" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Password / PIN</label>
+                            <input type="password" id="admin-pass-input" required placeholder="Enter secure password" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-orange">
+                            <p class="text-[11px] text-slate-500 mt-1">Default authorized username: <b>ramana reddy</b></p>
+                        </div>
+                        <button type="submit" class="w-full bg-orange hover:bg-orange-hover text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm">
+                            Secure Login <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </form>
+                    <button onclick="switchTab('home')" class="text-xs text-slate-500 hover:text-navy underline">← Back to Customer Website</button>
+                </div>
+            </div>
+
+            <div id="admin-dashboard-screen" class="hidden flex flex-col md:flex-row min-h-[calc(100vh-72px)]">
+                <!-- Admin Sidebar (Desktop) / Bottom Nav (Mobile) -->
+                <aside class="w-full md:w-64 bg-navy text-slate-300 p-4 sm:p-6 flex flex-col justify-between shrink-0">
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between pb-4 border-b border-slate-700">
+                            <div>
+                                <span class="text-white font-extrabold text-sm block">RAMANA REDDY</span>
+                                <span class="text-xs text-orange font-semibold">Authorized Admin</span>
+                            </div>
+                            <button onclick="handleAdminLogout()" class="text-slate-400 hover:text-white text-sm" title="Logout"><i class="fa-solid fa-power-off"></i></button>
+                        </div>
+                        <nav class="space-y-1">
+                            <button onclick="switchAdminSubTab('dash')" class="admin-subnav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white bg-orange transition" data-sub="dash">
+                                <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+                            </button>
+                            <button onclick="switchAdminSubTab('bookings')" class="admin-subnav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-white/10 transition" data-sub="bookings">
+                                <i class="fa-solid fa-calendar-days w-5"></i> Bookings & Approvals
+                            </button>
+                            <button onclick="switchAdminSubTab('issue')" class="admin-subnav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-white/10 transition" data-sub="issue">
+                                <i class="fa-solid fa-key w-5"></i> Pickup & Issue
+                            </button>
+                            <button onclick="switchAdminSubTab('returns')" class="admin-subnav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-white/10 transition" data-sub="returns">
+                                <i class="fa-solid fa-rotate-left w-5"></i> Returns & QR
+                            </button>
+                            <button onclick="switchAdminSubTab('fleet')" class="admin-subnav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-white/10 transition" data-sub="fleet">
+                                <i class="fa-solid fa-motorcycle w-5"></i> Fleet Management
+                            </button>
+                            <button onclick="switchAdminSubTab('finance')" class="admin-subnav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-white/10 transition" data-sub="finance">
+                                <i class="fa-solid fa-indian-rupee-sign w-5"></i> Financial Reports
+                            </button>
+                            <button onclick="switchAdminSubTab('deposits')" class="admin-subnav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-white/10 transition" data-sub="deposits">
+                                <i class="fa-solid fa-vault w-5"></i> Security Deposits
+                            </button>
+                            <button onclick="switchAdminSubTab('support')" class="admin-subnav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-white/10 transition" data-sub="support">
+                                <i class="fa-solid fa-headset w-5"></i> Support Tickets
+                            </button>
+                            <button onclick="switchAdminSubTab('settings')" class="admin-subnav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-white/10 transition" data-sub="settings">
+                                <i class="fa-solid fa-gear w-5"></i> Settings & Pricing
+                            </button>
+                        </nav>
+                    </div>
+                    <div class="pt-6 border-t border-slate-700 hidden md:block">
+                        <button onclick="switchTab('home')" class="w-full text-xs text-slate-400 hover:text-white flex items-center justify-center gap-2 py-2 bg-slate-800 rounded-xl">
+                            <i class="fa-solid fa-globe"></i> View Customer Site
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- Admin Main Content Area -->
+                <div class="flex-grow p-4 sm:p-8 overflow-y-auto">
+                    
+                    <!-- 8.1 Admin Dashboard Subtab -->
+                    <div id="admin-sub-dash" class="admin-subcontent space-y-8">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div>
+                                <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Admin Dashboard</h1>
+                                <p class="text-slate-600 text-sm">Fleet overview, active rentals, pending approvals, and today's revenue.</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="seedInitialData()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition">Reset / Seed Fleet</button>
+                                <button onclick="renderAdminDashboard()" class="bg-orange hover:bg-orange-hover text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                            </div>
+                        </div>
+
+                        <!-- Stats Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Available Bikes</span>
+                                    <h3 id="stat-available" class="text-3xl font-extrabold text-navy mt-1">0/7</h3>
+                                </div>
+                                <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl font-bold">
+                                    <i class="fa-solid fa-motorcycle"></i>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Active Rentals</span>
+                                    <h3 id="stat-active" class="text-3xl font-extrabold text-navy mt-1">0</h3>
+                                </div>
+                                <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl font-bold">
+                                    <i class="fa-solid fa-key"></i>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Pending Approvals</span>
+                                    <h3 id="stat-pending" class="text-3xl font-extrabold text-amber mt-1">0</h3>
+                                </div>
+                                <div class="w-14 h-14 bg-amber-50 text-amber rounded-2xl flex items-center justify-center text-2xl font-bold">
+                                    <i class="fa-solid fa-clock"></i>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Today's Revenue</span>
+                                    <h3 id="stat-revenue" class="text-3xl font-extrabold text-success mt-1">₹0</h3>
+                                </div>
+                                <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl font-bold">
+                                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pending Bookings Highlight Widget -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-navy text-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-bell text-amber"></i> Action Required: Pending Booking Requests
+                                </h3>
+                                <button onclick="switchAdminSubTab('bookings')" class="text-xs text-orange font-bold hover:underline">View All Bookings →</button>
+                            </div>
+                            <div id="dash-pending-list" class="overflow-x-auto">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8.2 Admin Bookings & Approvals Subtab -->
+                    <div id="admin-sub-bookings" class="admin-subcontent hidden space-y-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div>
+                                <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Bookings & Approvals</h1>
+                                <p class="text-slate-600 text-sm">Review, approve, or reject customer bookings with automatic time-slot overlap checks.</p>
+                            </div>
+                            <div class="flex gap-2 w-full sm:w-auto">
+                                <input type="text" id="admin-booking-search" oninput="renderAdminBookings()" placeholder="Search bookings..." class="bg-white border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-lightgrey text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                                            <th class="p-4">Booking ID</th>
+                                            <th class="p-4">Customer</th>
+                                            <th class="p-4">Bike</th>
+                                            <th class="p-4">Period</th>
+                                            <th class="p-4">Est. Amount</th>
+                                            <th class="p-4">Status</th>
+                                            <th class="p-4 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-bookings-tbody" class="divide-y divide-slate-100 text-sm">
+                                        <!-- Populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8.3 Admin Pickup & Issue Subtab -->
+                    <div id="admin-sub-issue" class="admin-subcontent hidden space-y-6">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Pickup & Bike Issue</h1>
+                            <p class="text-slate-600 text-sm">Issue approved bikes to customers, record rental payments, and collect optional security deposits.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                            <h3 class="font-bold text-navy text-lg mb-4">Approved Bookings Awaiting Pickup</h3>
+                            <div id="admin-issue-list" class="space-y-4">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8.4 Admin Returns & QR Subtab -->
+                    <div id="admin-sub-returns" class="admin-subcontent hidden space-y-6">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Bike Returns & QR Receipt Generation</h1>
+                            <p class="text-slate-600 text-sm">Process returns, check bike condition, calculate final charges, process deposits, and generate unique QR receipts.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                            <h3 class="font-bold text-navy text-lg mb-4">Currently Rented Bikes Awaiting Return</h3>
+                            <div id="admin-return-list" class="space-y-4">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8.5 Admin Fleet Management Subtab -->
+                    <div id="admin-sub-fleet" class="admin-subcontent hidden space-y-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Fleet Management (7 Bikes)</h1>
+                                <p class="text-slate-600 text-sm">Manage registration numbers, photos, pricing, and statuses for all 7 vehicles.</p>
+                            </div>
+                            <button onclick="openAddBikeModal()" class="bg-orange hover:bg-orange-hover text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Add New Bike
+                            </button>
+                        </div>
+                        <div id="admin-fleet-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- 8.6 Admin Financial Reports Subtab -->
+                    <div id="admin-sub-finance" class="admin-subcontent hidden space-y-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Financial Reports & Revenue</h1>
+                                <p class="text-slate-600 text-sm">Daily, weekly, monthly, and yearly revenue tracking, expense logs, and net operating income.</p>
+                            </div>
+                            <button onclick="exportFinancialCSV()" class="bg-navy hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+                                <i class="fa-solid fa-download"></i> Export CSV
+                            </button>
+                        </div>
+
+                        <!-- Financial summary cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Rental Revenue (YTD)</span>
+                                <h3 id="fin-total-rev" class="text-3xl font-extrabold text-success mt-1">₹0</h3>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Security Deposits Held</span>
+                                <h3 id="fin-total-deposits" class="text-3xl font-extrabold text-navy mt-1">₹0</h3>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Net Operating Income</span>
+                                <h3 id="fin-net-income" class="text-3xl font-extrabold text-orange mt-1">₹0</h3>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                            <h3 class="font-bold text-navy text-lg">Completed Rental Transactions Ledger</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead>
+                                        <tr class="bg-lightgrey text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                                            <th class="p-3">Booking ID</th>
+                                            <th class="p-3">Customer</th>
+                                            <th class="p-3">Bike</th>
+                                            <th class="p-3">Rental Amount</th>
+                                            <th class="p-3">Deposit Status</th>
+                                            <th class="p-3">Return Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="finance-ledger-tbody" class="divide-y divide-slate-100">
+                                        <!-- Populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8.7 Admin Security Deposits Subtab -->
+                    <div id="admin-sub-deposits" class="admin-subcontent hidden space-y-6">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Security Deposit Management</h1>
+                            <p class="text-slate-600 text-sm">Track collected security deposits, refunds, and damage deductions.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                            <div id="admin-deposits-list" class="space-y-4">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8.8 Admin Support Tickets Subtab -->
+                    <div id="admin-sub-support" class="admin-subcontent hidden space-y-6">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Customer Support Tickets</h1>
+                            <p class="text-slate-600 text-sm">Manage customer inquiries and messages submitted via the website.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                            <div id="admin-support-list" class="space-y-4">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8.9 Admin Settings & Pricing Subtab -->
+                    <div id="admin-sub-settings" class="admin-subcontent hidden space-y-6">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-navy">Global Pricing & System Settings</h1>
+                            <p class="text-slate-600 text-sm">Configure default daily rates, weekly packages, monthly packages, and security deposit rules.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6 max-w-xl">
+                            <form onsubmit="saveGlobalSettings(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Default Daily Rate (₹)</label>
+                                    <input type="number" id="set-daily-rate" value="400" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Default Weekly Package (₹)</label>
+                                    <input type="number" id="set-weekly-rate" value="2800" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Default Monthly Package (₹)</label>
+                                    <input type="number" id="set-monthly-rate" value="12000" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Default Security Deposit (₹)</label>
+                                    <input type="number" id="set-deposit-amt" value="500" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none">
+                                </div>
+                                <button type="submit" class="bg-orange hover:bg-orange-hover text-white font-bold px-6 py-3 rounded-xl transition shadow text-sm">
+                                    Save Settings
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-navy text-slate-400 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-orange flex items-center justify-center text-white text-lg font-extrabold">
+                        <i class="fa-solid fa-motorcycle"></i>
+                    </div>
+                    <span class="text-white font-extrabold text-lg tracking-wider">BIKE RENTALS</span>
+                </div>
+                <p class="text-xs leading-relaxed text-slate-400">
+                    Nashik's trusted independent bike and scooter rental service. Fully managed fleet with transparent pricing and secure booking approvals.
+                </p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-sm mb-4 uppercase tracking-wider">Quick Links</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><button onclick="switchTab('home')" class="hover:text-white transition">Home</button></li>
+                    <li><button onclick="switchTab('explore')" class="hover:text-white transition">Explore 7 Bikes</button></li>
+                    <li><button onclick="switchTab('my-bookings')" class="hover:text-white transition">My Bookings</button></li>
+                    <li><button onclick="switchTab('support')" class="hover:text-white transition">Customer Support</button></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-sm mb-4 uppercase tracking-wider">Contact & Location</h4>
+                <ul class="space-y-2 text-xs text-slate-300">
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-orange"></i> Kharchee hostel, sandip university, nashik</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-phone text-orange"></i> +91 63022 40389</li>
+                    <li class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-emerald-400"></i> WhatsApp Support Available</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-sm mb-4 uppercase tracking-wider">Admin Portal</h4>
+                <p class="text-xs text-slate-400 mb-3">Authorized management portal for owners.</p>
+                <button onclick="openAdminLoginModal()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-xs font-semibold transition">
+                    Admin Login (ramana reddy)
+                </button>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-slate-800 text-center text-xs text-slate-500">
+            © 2026 BIKE RENTALS, Nashik, Maharashtra. All rights reserved. Built with senior full-stack standards.
+        </div>
+    </footer>
+
+    <!-- RETURN RECEIPT MODAL -->
+    <div id="receipt-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-success/10 text-success flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-navy">Return Receipt</h3>
+                        <p class="text-xs text-slate-500">BIKE RENTALS, Nashik</p>
+                    </div>
+                </div>
+                <button onclick="closeReceiptModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="receipt-content" class="space-y-4 text-sm text-slate-700">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="mt-8 flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2"><i class="fa-solid fa-print"></i> Print</button>
+                <button onclick="closeReceiptModal()" class="bg-orange hover:bg-orange-hover text-white px-5 py-2.5 rounded-xl text-xs font-bold transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // --- INITIAL DATA & LOCALSTORAGE STATE ---
+        const INITIAL_FLEET = [
+            { id: 'BR001', model: 'TVS Star City', color: 'Red and white', type: 'Commuter', dailyRate: 400, weeklyRate: 2400, status: 'Available', regNo: 'MH-15-AB-1001', photo: 'https://placehold.co/600x400/14243A/FFFFFF?text=TVS+Star+City+2013+(Red/White)' },
+            { id: 'BR002', model: 'Suzuki Access 125',  color: 'White', type: 'Scooter', dailyRate: 400, weeklyRate: 2400, status: 'Available', regNo: 'MH-15-AC-1002', photo: 'https://placehold.co/600x400/14243A/FFFFFF?text=Suzuki+Access+125+(White-1)' },
+            { id: 'BR003', model: 'Suzuki Access 125',  color: 'White', type: 'Scooter', dailyRate: 400, weeklyRate: 2400, status: 'Available', regNo: 'MH-15-AC-1003', photo: 'https://placehold.co/600x400/14243A/FFFFFF?text=Suzuki+Access+125+(White-2)' },
+            { id: 'BR004', model: 'Honda Livo',  color: 'Black', type: 'Commuter', dailyRate: 400, weeklyRate: 2400, status: 'Available', regNo: 'MH-15-BL-1004', photo: 'https://placehold.co/600x400/14243A/FFFFFF?text=Honda+Livo+2017+(Black)' },
+            { id: 'BR005', model: 'Honda CB Twister', color: 'Black', type: 'Commuter', dailyRate: 400, weeklyRate: 2400,  status: 'Available', regNo: 'MH-15-CT-1005', photo: 'https://placehold.co/600x400/14243A/FFFFFF?text=Honda+CB+Twister+2011+(Black)' },
+            { id: 'BR006', model: 'Hero Karizma ZMR',  color: 'White', type: 'Sports', dailyRate: 400, weeklyRate: 2400,  status: 'Available', regNo: 'MH-15-KZ-1006', photo: 'https://placehold.co/600x400/14243A/FFFFFF?text=Hero+Karizma+ZMR+2011+(White)' },
+            { id: 'BR007', model: 'Hero Karizma ZMR',  color: 'Black', type: 'Sports', dailyRate: 400, weeklyRate: 2400,  status: 'Available', regNo: 'MH-15-KZ-1007', photo: 'https://placehold.co/600x400/14243A/FFFFFF?text=Hero+Karizma+ZMR+2011+(Black)' }
+        ];
+
+        let fleet = JSON.parse(localStorage.getItem('bike_fleet')) || INITIAL_FLEET;
+        let bookings = JSON.parse(localStorage.getItem('bike_bookings')) || [];
+        let supportTickets = JSON.parse(localStorage.getItem('bike_support')) || [];
+        let isAdminLoggedIn = localStorage.getItem('bike_admin_auth') === 'true';
+
+        // Save state helper
+        function saveState() {
+            localStorage.setItem('bike_fleet', JSON.stringify(fleet));
+            localStorage.setItem('bike_bookings', JSON.stringify(bookings));
+            localStorage.setItem('bike_support', JSON.stringify(supportTickets));
+        }
+
+        // Seed / Reset Initial Data
+        function seedInitialData() {
+            fleet = INITIAL_FLEET;
+            bookings = [
+                {
+                    id: 'BRN-1001',
+                    bikeId: 'BR001',
+                    bikeModel: 'TVS Star City (2013)',
+                    customerName: 'Amit Patil',
+                    customerMobile: '9822112233',
+                    pickup: '2026-10-15T09:00',
+                    return: '2026-10-17T18:00',
+                    amount: 1200,
+                    deposit: 500,
+                    status: 'Completed',
+                    paymentStatus: 'Paid',
+                    depositStatus: 'Refunded',
+                    submittedAt: '2026-10-14 10:30:00'
+                }
+            ];
+            saveState();
+            showToast('Fleet and bookings seeded successfully!', 'success');
+            initApp();
+        }
+
+        // --- UI TOAST & MODAL HELPERS ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgCol = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-navy';
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-info-circle';
+            
+            toast.className = `${bgCol} text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-semibold pointer-events-auto transform transition-all duration-300 translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 50);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function showModal(title, message, iconClass = 'fa-info') {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('modal-icon').innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        // --- NAVIGATION & TABS ---
+        function switchTab(tabId) {
+            if (tabId === 'admin') {
+                if (!isAdminLoggedIn) {
+                    document.getElementById('admin-login-screen').classList.remove('hidden');
+                    document.getElementById('admin-dashboard-screen').classList.add('hidden');
+                } else {
+                    document.getElementById('admin-login-screen').classList.add('hidden');
+                    document.getElementById('admin-dashboard-screen').classList.remove('hidden');
+                    renderAdminDashboard();
+                }
+            }
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.dataset.tab === tabId) {
+                    btn.classList.add('bg-white/20');
+                } else {
+                    btn.classList.remove('bg-white/20');
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (tabId === 'explore') renderExploreFleet();
+            if (tabId === 'home') renderHomeFleet();
+            if (tabId === 'my-bookings') searchMyBookings();
+        }
+
+        function switchAdminSubTab(subId) {
+            document.querySelectorAll('.admin-subcontent').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`admin-sub-${subId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.admin-subnav').forEach(btn => {
+                if (btn.dataset.sub === subId) {
+                    btn.classList.add('bg-orange', 'text-white');
+                    btn.classList.remove('hover:bg-white/10');
+                } else {
+                    btn.classList.remove('bg-orange', 'text-white');
+                    btn.classList.add('hover:bg-white/10');
+                }
+            });
+
+            if (subId === 'dash') renderAdminDashboard();
+            if (subId === 'bookings') renderAdminBookings();
+            if (subId === 'issue') renderAdminIssueList();
+            if (subId === 'returns') renderAdminReturnList();
+            if (subId === 'fleet') renderAdminFleet();
+            if (subId === 'finance') renderAdminFinance();
+            if (subId === 'deposits') renderAdminDeposits();
+            if (subId === 'support') renderAdminSupport();
+        }
+
+        // --- RENDER HOME FLEET ---
+        function renderHomeFleet() {
+            const container = document.getElementById('home-fleet-grid');
+            container.innerHTML = fleet.slice(0, 3).map(bike => `
+                <div class="bg-lightgrey rounded-3xl overflow-hidden border border-slate-200 flex flex-col justify-between shadow-sm hover:shadow-md transition">
+                    <div class="relative h-48 bg-slate-200">
+                        <img src="${bike.photo}" alt="${bike.model}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/14243A/FFFFFF?text=Bike+Photo'">
+                        <span class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold ${bike.status === 'Available' ? 'bg-success text-white' : 'bg-amber text-white'}">${bike.status}</span>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <span class="text-xs font-bold text-orange uppercase tracking-wider">${bike.type} • ${bike.year}</span>
+                            <h3 class="text-xl font-extrabold text-navy mt-0.5">${bike.model}</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Color: ${bike.color} | ID: ${bike.id}</p>
+                        </div>
+                        <div class="flex justify-between items-center pt-4 border-t border-slate-200">
+                            <div>
+                                <span class="text-xs text-slate-500 block">Daily Rate</span>
+                                <span class="text-lg font-bold text-navy">₹${bike.dailyRate}<span class="text-xs text-slate-500">/day</span></span>
+                            </div>
+                            <button onclick="openBookingForm('${bike.id}')" class="bg-orange hover:bg-orange-hover text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow">
+                                Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- RENDER EXPLORE FLEET ---
+        function renderExploreFleet() {
+            const container = document.getElementById('explore-fleet-grid');
+            const search = document.getElementById('fleet-search').value.toLowerCase();
+            const typeFilter = document.getElementById('fleet-filter-type').value;
+            const statusFilter = document.getElementById('fleet-filter-status').value;
+
+            const filtered = fleet.filter(bike => {
+                const matchSearch = bike.model.toLowerCase().includes(search) || bike.id.toLowerCase().includes(search) || bike.color.toLowerCase().includes(search);
+                const matchType = typeFilter === 'all' || bike.type === typeFilter;
+                const matchStatus = statusFilter === 'all' || bike.status === statusFilter;
+                return matchSearch && matchType && matchStatus;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-3 text-center py-12 text-slate-500">No matching bikes found in fleet.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(bike => `
+                <div class="bg-white rounded-3xl overflow-hidden border border-slate-200 flex flex-col justify-between shadow-sm hover:shadow-md transition">
+                    <div class="relative h-52 bg-slate-200 cursor-pointer" onclick="viewBikeDetails('${bike.id}')">
+                        <img src="${bike.photo}" alt="${bike.model}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/14243A/FFFFFF?text=Bike+Photo'">
+                        <span class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold ${bike.status === 'Available' ? 'bg-success text-white' : 'bg-amber text-white'}">${bike.status}</span>
+                        <span class="absolute bottom-3 left-3 bg-navy/80 backdrop-blur text-white px-3 py-1 rounded-lg text-xs font-semibold">ID: ${bike.id}</span>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <span class="text-xs font-bold text-orange uppercase tracking-wider">${bike.type} • ${bike.year} • ${bike.color}</span>
+                            <h3 class="text-xl font-extrabold text-navy mt-0.5 cursor-pointer hover:text-orange" onclick="viewBikeDetails('${bike.id}')">${bike.model}</h3>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 bg-lightgrey p-3 rounded-2xl text-center">
+                            <div>
+                                <span class="text-[10px] text-slate-500 block uppercase font-bold">Daily</span>
+                                <span class="text-sm font-bold text-navy">₹${bike.dailyRate}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-500 block uppercase font-bold">Weekly</span>
+                                <span class="text-sm font-bold text-navy">₹${bike.weeklyRate}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-500 block uppercase font-bold">Monthly</span>
+                                <span class="text-sm font-bold text-navy">₹${bike.monthlyRate}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button onclick="viewBikeDetails('${bike.id}')" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition text-xs">Details</button>
+                            <button onclick="openBookingForm('${bike.id}')" class="w-1/2 bg-orange hover:bg-orange-hover text-white font-bold py-3 rounded-xl transition text-xs shadow">Book Now</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterFleet() {
+            renderExploreFleet();
+        }
+
+        // --- BIKE DETAILS VIEW ---
+        function viewBikeDetails(bikeId) {
+            const bike = fleet.find(b => b.id === bikeId);
+            if (!bike) return;
+
+            const container = document.getElementById('bike-details-container');
+            container.innerHTML = `
+                <button onclick="switchTab('explore')" class="text-xs text-slate-500 hover:text-navy mb-6 flex items-center gap-1 font-semibold"><i class="fa-solid fa-arrow-left"></i> Back to Explore Fleet</button>
+                <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-8 p-6 sm:p-8">
+                    <div class="space-y-4">
+                        <div class="rounded-2xl overflow-hidden h-72 bg-slate-100 border border-slate-200">
+                            <img src="${bike.photo}" alt="${bike.model}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="bg-lightgrey p-4 rounded-2xl space-y-2">
+                            <div class="flex justify-between text-sm"><span class="text-slate-500">Unique Fleet ID:</span><span class="font-bold text-navy">${bike.id}</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-slate-500">Registration No:</span><span class="font-bold text-navy">${bike.regNo || 'MH-15-...'}</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-slate-500">Model Year:</span><span class="font-bold text-navy">${bike.year}</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-slate-500">Color:</span><span class="font-bold text-navy">${bike.color}</span></div>
+                        </div>
+                    </div>
+                    <div class="space-y-6 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-orange uppercase tracking-wider">${bike.type}</span>
+                            <h1 class="text-3xl font-extrabold text-navy mt-1">${bike.model}</h1>
+                            <span class="inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold ${bike.status === 'Available' ? 'bg-success/10 text-success' : 'bg-amber/10 text-amber'}">${bike.status}</span>
+                            
+                            <div class="mt-6 space-y-3">
+                                <h4 class="font-bold text-navy text-sm uppercase tracking-wider">Pricing Reference</h4>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div class="bg-lightgrey p-3 rounded-xl text-center border border-slate-200">
+                                        <span class="text-[10px] text-slate-500 uppercase block font-bold">Daily</span>
+                                        <span class="text-base font-bold text-navy">₹${bike.dailyRate}</span>
+                                    </div>
+                                    <div class="bg-lightgrey p-3 rounded-xl text-center border border-slate-200">
+                                        <span class="text-[10px] text-slate-500 uppercase block font-bold">Weekly</span>
+                                        <span class="text-base font-bold text-navy">₹${bike.weeklyRate}</span>
+                                    </div>
+                                    <div class="bg-lightgrey p-3 rounded-xl text-center border border-slate-200">
+                                        <span class="text-[10px] text-slate-500 uppercase block font-bold">Monthly</span>
+                                        <span class="text-base font-bold text-navy">₹${bike.monthlyRate}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="openBookingForm('${bike.id}')" class="w-full bg-orange hover:bg-orange-hover text-white font-bold py-4 rounded-2xl transition shadow-lg text-base flex items-center justify-center gap-2">
+                            Book This Bike Now <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            switchTab('details');
+        }
+
+        // --- QUICK SEARCH ON HOME ---
+        function handleQuickSearch(e) {
+            e.preventDefault();
+            const pickup = document.getElementById('search-pickup').value;
+            const ret = document.getElementById('search-return').value;
+            const model = document.getElementById('search-bike-model').value;
+
+            if (new Date(pickup) >= new Date(ret)) {
+                showToast('Return time must be after pickup time.', 'error');
+                return;
+            }
+
+            switchTab('explore');
+        }
+
+        // --- BOOKING FORM FLOW ---
+        function openBookingForm(bikeId) {
+            const bike = fleet.find(b => b.id === bikeId);
+            if (!bike) return;
+
+            document.getElementById('book-bike-id').value = bike.id;
+            
+            // Set default pickup (now) and return (+24 hours)
+            const now = new Date();
+            const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            document.getElementById('book-pickup').value = now.toISOString().slice(0, 16);
+            document.getElementById('book-return').value = tomorrow.toISOString().slice(0, 16);
+
+            document.getElementById('booking-bike-preview').innerHTML = `
+                <img src="${bike.photo}" class="w-20 h-16 object-cover rounded-xl border border-slate-200" onerror="this.src='https://placehold.co/100x100/14243A/FFFFFF?text=Bike'">
+                <div>
+                    <span class="text-xs font-bold text-orange uppercase">${bike.id} • ${bike.year}</span>
+                    <h4 class="font-extrabold text-navy text-base">${bike.model}</h4>
+                    <p class="text-xs text-slate-500">Rate: ₹${bike.dailyRate}/day + ₹500 refundable deposit at pickup</p>
+                </div>
+            `;
+
+            calculateBookingEstimate();
+            switchTab('book');
+        }
+
+        function calculateBookingEstimate() {
+            const pickupVal = document.getElementById('book-pickup').value;
+            const returnVal = document.getElementById('book-return').value;
+            const bikeId = document.getElementById('book-bike-id').value;
+            const bike = fleet.find(b => b.id === bikeId);
+
+            if (!pickupVal || !returnVal || !bike) return;
+
+            const start = new Date(pickupVal);
+            const end = new Date(returnVal);
+            const diffHours = Math.max(1, (end - start) / (1000 * 60 * 60));
+            const diffDays = Math.ceil(diffHours / 24);
+
+            let amount = diffDays * bike.dailyRate;
+            if (diffDays >= 30) {
+                amount = Math.floor(diffDays / 30) * bike.monthlyRate + (diffDays % 30) * bike.dailyRate;
+            } else if (diffDays >= 7) {
+                amount = Math.floor(diffDays / 7) * bike.weeklyRate + (diffDays % 7) * bike.dailyRate;
+            }
+
+            document.getElementById('est-duration').innerText = `${diffDays} day(s) (${Math.round(diffHours)} hrs)`;
+            document.getElementById('est-amount').innerText = `₹${amount}`;
+        }
+
+        function submitBookingRequest(e) {
+            e.preventDefault();
+            const bikeId = document.getElementById('book-bike-id').value;
+            const bike = fleet.find(b => b.id === bikeId);
+            const name = document.getElementById('cust-name').value.trim();
+            const mobile = document.getElementById('cust-mobile').value.trim();
+            const pickup = document.getElementById('book-pickup').value;
+            const ret = document.getElementById('book-return').value;
+
+            if (new Date(pickup) >= new Date(ret)) {
+                showToast('Return date/time must be after pickup date/time.', 'error');
+                return;
+            }
+
+            const start = new Date(pickup);
+            const end = new Date(ret);
+            const diffDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+            let amount = diffDays * bike.dailyRate;
+
+            const bookingId = 'BRN-' + Math.floor(1000 + Math.random() * 9000);
+            const nowIST = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+            const newBooking = {
+                id: bookingId,
+                bikeId: bike.id,
+                bikeModel: `${bike.model} (${bike.year})`,
+                customerName: name,
+                customerMobile: mobile,
+                pickup: pickup,
+                return: ret,
+                amount: amount,
+                deposit: 500,
+                status: 'Pending Approval',
+                paymentStatus: 'Pending',
+                depositStatus: 'Awaiting Pickup',
+                submittedAt: nowIST
+            };
+
+            bookings.unshift(newBooking);
+            saveState();
+
+            showModal('Booking Request Submitted!', `Your booking ID is ${bookingId}. The owner will review and approve your request shortly. You can track status in 'My Bookings'.`, 'fa-circle-check');
+            switchTab('my-bookings');
+        }
+
+        // --- MY BOOKINGS TRACKING ---
+        function searchMyBookings() {
+            const query = document.getElementById('track-query').value.trim();
+            const container = document.getElementById('my-bookings-results');
+
+            let filtered = bookings;
+            if (query) {
+                filtered = bookings.filter(b => b.customerMobile.includes(query) || b.id.toLowerCase().includes(query.toLowerCase()));
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-8 rounded-3xl text-center border border-slate-200">
+                        <i class="fa-solid fa-calendar-xmark text-4xl text-slate-300 mb-3"></i>
+                        <h4 class="font-bold text-navy text-lg">No Bookings Found</h4>
+                        <p class="text-xs text-slate-500 mt-1">Check your mobile number or booking ID and try again.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(b => {
+                const statusBadge = 
+                    b.status === 'Pending Approval' ? 'bg-amber/10 text-amber border-amber/30' :
+                    b.status === 'Approved' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                    b.status === 'Active' ? 'bg-orange/10 text-orange border-orange/30' :
+                    b.status === 'Completed' ? 'bg-success/10 text-success border-success/30' : 'bg-red-50 text-red-600 border-red-200';
+
+                return `
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-4 border-b border-slate-100">
+                            <div>
+                                <span class="text-xs font-bold text-slate-400">Booking ID: <b class="text-navy">${b.id}</b></span>
+                                <h3 class="text-xl font-extrabold text-navy mt-0.5">${b.bikeModel}</h3>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusBadge}">${b.status}</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm bg-lightgrey p-4 rounded-2xl">
+                            <div>
+                                <span class="text-xs text-slate-500 block font-semibold uppercase">Customer</span>
+                                <span class="font-bold text-navy">${b.customerName} (${b.customerMobile})</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 block font-semibold uppercase">Rental Period</span>
+                                <span class="font-bold text-navy">${new Date(b.pickup).toLocaleString()} to <br>${new Date(b.return).toLocaleString()}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 block font-semibold uppercase">Estimated / Final Charges</span>
+                                <span class="font-bold text-orange text-lg">₹${b.amount}</span>
+                                <span class="text-xs text-slate-500 block">Deposit: ₹${b.deposit} (${b.depositStatus})</span>
+                            </div>
+                        </div>
+                        ${b.status === 'Completed' ? `
+                            <div class="flex justify-end pt-2">
+                                <button onclick="viewReturnReceipt('${b.id}')" class="bg-success hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow flex items-center gap-2">
+                                    <i class="fa-solid fa-qrcode"></i> View Return QR Receipt
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- SUPPORT TICKET SUBMISSION ---
+        function submitSupportTicket(e) {
+            e.preventDefault();
+            const name = document.getElementById('sup-name').value;
+            const mobile = document.getElementById('sup-mobile').value;
+            const msg = document.getElementById('sup-msg').value;
+
+            supportTickets.unshift({
+                id: 'SUP-' + Math.floor(100 + Math.random() * 900),
+                name, mobile, message: msg, status: 'Open', date: new Date().toLocaleString()
+            });
+            saveState();
+            showToast('Support ticket submitted successfully!', 'success');
+            e.target.reset();
+        }
+
+        // --- ADMIN LOGIN / AUTH ---
+        function openAdminLoginModal() {
+            switchTab('admin');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('admin-user-input').value.trim();
+            const pass = document.getElementById('admin-pass-input').value.trim();
+
+            if (user.toLowerCase() === 'ramana reddy' && pass.length > 0) {
+                isAdminLoggedIn = true;
+                localStorage.setItem('bike_admin_auth', 'true');
+                showToast('Welcome Admin Ramana Reddy!', 'success');
+                switchTab('admin');
+            } else {
+                showToast('Invalid admin credentials. Username is ramana reddy.', 'error');
+            }
+        }
+
+        function handleAdminLogout() {
+            isAdminLoggedIn = false;
+            localStorage.removeItem('bike_admin_auth');
+            showToast('Logged out from admin portal.', 'success');
+            switchTab('home');
+        }
+
+        // --- ADMIN DASHBOARD RENDER ---
+        function renderAdminDashboard() {
+            const availableCount = fleet.filter(b => b.status === 'Available').length;
+            const activeCount = bookings.filter(b => b.status === 'Active').length;
+            const pendingCount = bookings.filter(b => b.status === 'Pending Approval').length;
+
+            // Calculate today's revenue
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const todayRev = bookings
+                .filter(b => b.status === 'Completed' && b.submittedAt.includes(todayStr.split('-').reverse().join('/')))
+                .reduce((sum, b) => sum + b.amount, 0);
+
+            document.getElementById('stat-available').innerText = `${availableCount}/7`;
+            document.getElementById('stat-active').innerText = activeCount;
+            document.getElementById('stat-pending').innerText = pendingCount;
+            document.getElementById('stat-revenue').innerText = `₹${todayRev}`;
+
+            // Render dashboard pending list
+            const pendingList = bookings.filter(b => b.status === 'Pending Approval');
+            const container = document.getElementById('dash-pending-list');
+
+            if (pendingList.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">No pending booking requests awaiting approval.</p>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="bg-lightgrey text-slate-700 text-xs font-bold uppercase tracking-wider">
+                            <th class="p-3">Booking ID</th>
+                            <th class="p-3">Customer</th>
+                            <th class="p-3">Bike</th>
+                            <th class="p-3">Period</th>
+                            <th class="p-3">Amount</th>
+                            <th class="p-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        ${pendingList.map(b => `
+                            <tr>
+                                <td class="p-3 font-bold text-navy">${b.id}</td>
+                                <td class="p-3">${b.customerName}<br><span class="text-xs text-slate-500">${b.customerMobile}</span></td>
+                                <td class="p-3 font-semibold">${b.bikeModel}</td>
+                                <td class="p-3 text-xs">${new Date(b.pickup).toLocaleString()}<br>to ${new Date(b.return).toLocaleString()}</td>
+                                <td class="p-3 font-bold text-orange">₹${b.amount}</td>
+                                <td class="p-3 text-right space-x-2">
+                                    <button onclick="approveBooking('${b.id}')" class="bg-success text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-700 transition">Approve</button>
+                                    <button onclick="rejectBooking('${b.id}')" class="bg-danger text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 transition">Reject</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // --- ADMIN BOOKINGS & APPROVALS (OVERLAP CHECKS) ---
+        function renderAdminBookings() {
+            const tbody = document.getElementById('admin-bookings-tbody');
+            const search = document.getElementById('admin-booking-search')?.value.toLowerCase() || '';
+
+            const filtered = bookings.filter(b => b.id.toLowerCase().includes(search) || b.customerName.toLowerCase().includes(search) || b.customerMobile.includes(search));
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No bookings recorded.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(b => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-4 font-bold text-navy">${b.id}</td>
+                    <td class="p-4">${b.customerName}<br><span class="text-xs text-slate-500">${b.customerMobile}</span></td>
+                    <td class="p-4 font-semibold">${b.bikeModel}</td>
+                    <td class="p-4 text-xs">${new Date(b.pickup).toLocaleString()}<br>to ${new Date(b.return).toLocaleString()}</td>
+                    <td class="p-4 font-bold text-orange">₹${b.amount}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">${b.status}</span></td>
+                    <td class="p-4 text-right space-x-2">
+                        ${b.status === 'Pending Approval' ? `
+                            <button onclick="approveBooking('${b.id}')" class="bg-success text-white px-3 py-1.5 rounded-lg text-xs font-bold">Approve</button>
+                            <button onclick="rejectBooking('${b.id}')" class="bg-danger text-white px-3 py-1.5 rounded-lg text-xs font-bold">Reject</button>
+                        ` : `
+                            <span class="text-xs text-slate-400 font-semibold">${b.status}</span>
+                        `}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function approveBooking(bookingId) {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (!booking) return;
+
+            // Strict Overlap Check for the same bike ID across all Approved or Active bookings
+            const conflict = bookings.some(b => 
+                b.bikeId === booking.bikeId && 
+                b.id !== bookingId && 
+                (b.status === 'Approved' || b.status === 'Active') &&
+                !(new Date(booking.return) <= new Date(b.pickup) || new Date(booking.pickup) >= new Date(b.return))
+            );
+
+            if (conflict) {
+                showToast('Cannot approve: Selected bike is already reserved or rented for overlapping time slot!', 'error');
+                return;
+            }
+
+            booking.status = 'Approved';
+            saveState();
+            showToast(`Booking ${bookingId} approved successfully! Bike slot reserved.`, 'success');
+            renderAdminBookings();
+            renderAdminDashboard();
+        }
+
+        function rejectBooking(bookingId) {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (!booking) return;
+
+            booking.status = 'Rejected';
+            saveState();
+            showToast(`Booking ${bookingId} rejected.`, 'error');
+            renderAdminBookings();
+            renderAdminDashboard();
+        }
+
+        // --- PICKUP & ISSUE WORKFLOW ---
+        function renderAdminIssueList() {
+            const container = document.getElementById('admin-issue-list');
+            const approvedList = bookings.filter(b => b.status === 'Approved');
+
+            if (approvedList.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">No approved bookings awaiting pickup.</p>`;
+                return;
+            }
+
+            container.innerHTML = approvedList.map(b => `
+                <div class="bg-lightgrey p-5 rounded-2xl border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="space-y-1">
+                        <span class="text-xs font-bold text-orange">${b.id} • Bike ID: ${b.bikeId}</span>
+                        <h4 class="font-extrabold text-navy text-lg">${b.bikeModel}</h4>
+                        <p class="text-xs text-slate-600">Customer: <b>${b.customerName}</b> (${b.customerMobile})</p>
+                        <p class="text-xs text-slate-500">Period: ${new Date(b.pickup).toLocaleString()} to ${new Date(b.return).toLocaleString()}</p>
+                    </div>
+                    <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                        <div class="text-right">
+                            <span class="text-xs text-slate-500 block">Rental Due</span>
+                            <span class="font-bold text-orange text-lg">₹${b.amount}</span>
+                        </div>
+                        <button onclick="issueBike('${b.id}')" class="bg-navy hover:bg-slate-800 text-white font-bold px-5 py-3 rounded-xl text-xs transition shadow flex items-center gap-2">
+                            <i class="fa-solid fa-key"></i> Issue Bike & Collect Deposit
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function issueBike(bookingId) {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (!booking) return;
+
+            booking.status = 'Active';
+            booking.paymentStatus = 'Paid';
+            booking.depositStatus = 'Collected';
+
+            // Mark bike status as Rented
+            const bike = fleet.find(b => b.id === booking.bikeId);
+            if (bike) bike.status = 'Rented';
+
+            saveState();
+            showToast(`Bike successfully issued for booking ${bookingId}!`, 'success');
+            renderAdminIssueList();
+            renderAdminDashboard();
+        }
+
+        // --- RETURN & QR RECEIPT WORKFLOW ---
+        function renderAdminReturnList() {
+            const container = document.getElementById('admin-return-list');
+            const activeList = bookings.filter(b => b.status === 'Active');
+
+            if (activeList.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">No active rentals currently on road.</p>`;
+                return;
+            }
+
+            container.innerHTML = activeList.map(b => `
+                <div class="bg-lightgrey p-5 rounded-2xl border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="space-y-1">
+                        <span class="text-xs font-bold text-success">${b.id} • Bike ID: ${b.bikeId}</span>
+                        <h4 class="font-extrabold text-navy text-lg">${b.bikeModel}</h4>
+                        <p class="text-xs text-slate-600">Customer: <b>${b.customerName}</b> (${b.customerMobile})</p>
+                        <p class="text-xs text-slate-500">Scheduled Return: ${new Date(b.return).toLocaleString()}</p>
+                    </div>
+                    <button onclick="openReturnModal('${b.id}')" class="bg-orange hover:bg-orange-hover text-white font-bold px-5 py-3 rounded-xl text-xs transition shadow flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Process Return & QR Receipt
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function openReturnModal(bookingId) {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (!booking) return;
+
+            const modalHtml = `
+                <div id="return-process-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6">
+                        <h3 class="text-xl font-bold text-navy">Complete Return: ${booking.id}</h3>
+                        <div class="space-y-4 text-sm">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Bike Condition Notes</label>
+                                <input type="text" id="ret-condition" value="Good condition, no damage" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Final Rental Charges (₹)</label>
+                                <input type="number" id="ret-final-amount" value="${booking.amount}" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Security Deposit Refund (₹)</label>
+                                <input type="number" id="ret-deposit-refund" value="${booking.deposit}" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium">
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                            <button onclick="document.getElementById('return-process-modal').remove()" class="px-4 py-2.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-700">Cancel</button>
+                            <button onclick="finalizeReturn('${booking.id}')" class="px-5 py-2.5 bg-success hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow">Complete Return & Generate QR</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function finalizeReturn(bookingId) {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (!booking) return;
+
+            const condition = document.getElementById('ret-condition').value;
+            const finalAmount = parseFloat(document.getElementById('ret-final-amount').value);
+            const depositRefund = parseFloat(document.getElementById('ret-deposit-refund').value);
+
+            booking.status = 'Completed';
+            booking.amount = finalAmount;
+            booking.depositStatus = depositRefund === booking.deposit ? 'Refunded' : 'Partially Refunded';
+            booking.returnCondition = condition;
+            booking.completedAt = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+            // Free up the bike in fleet
+            const bike = fleet.find(b => b.id === booking.bikeId);
+            if (bike) bike.status = 'Available';
+
+            saveState();
+            document.getElementById('return-process-modal').remove();
+            showToast(`Return completed for booking ${bookingId}! Bike is now available.`, 'success');
+            renderAdminReturnList();
+            renderAdminDashboard();
+            viewReturnReceipt(bookingId);
+        }
+
+        function viewReturnReceipt(bookingId) {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (!booking) return;
+
+            const modal = document.getElementById('receipt-modal');
+            const content = document.getElementById('receipt-content');
+
+            content.innerHTML = `
+                <div class="text-center space-y-1 pb-4 border-b border-slate-100">
+                    <h4 class="font-extrabold text-navy text-lg">BIKE RENTALS RETURN RECEIPT</h4>
+                    <p class="text-xs text-slate-500">Nashik, Maharashtra • Booking ID: ${booking.id}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-xs bg-lightgrey p-4 rounded-2xl">
+                    <div><span class="text-slate-500 block">Customer:</span><b class="text-navy">${booking.customerName} (${booking.customerMobile})</b></div>
+                    <div><span class="text-slate-500 block">Bike Model & ID:</span><b class="text-navy">${booking.bikeModel} [${booking.bikeId}]</b></div>
+                    <div><span class="text-slate-500 block">Pickup Time:</span><b class="text-navy">${new Date(booking.pickup).toLocaleString()}</b></div>
+                    <div><span class="text-slate-500 block">Return Time:</span><b class="text-navy">${new Date(booking.return).toLocaleString()}</b></div>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between"><span>Rental Payment Status:</span><b class="text-success">${booking.paymentStatus} (₹${booking.amount})</b></div>
+                    <div class="flex justify-between"><span>Security Deposit Status:</span><b class="text-navy">${booking.depositStatus} (₹${booking.deposit})</b></div>
+                    <div class="flex justify-between"><span>Bike Condition:</span><b class="text-navy">${booking.returnCondition || 'Good'}</b></div>
+                </div>
+                <div class="pt-4 border-t border-slate-100 text-center space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 block">Official Return QR Verification Code</span>
+                    <div id="qrcode" class="flex justify-center p-3 bg-white rounded-2xl border border-slate-200 inline-block mx-auto"></div>
+                    <p class="text-[10px] text-slate-400">Scan this secure token to verify authenticity with BIKE RENTALS Nashik.</p>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+
+            // Generate QR code
+            document.getElementById('qrcode').innerHTML = '';
+            new QRCode(document.getElementById('qrcode'), {
+                text: `BIKE-RENTALS-NASHIK-RECEIPT-${booking.id}-${booking.customerMobile}`,
+                width: 128,
+                height: 128,
+                colorDark: '#14243A',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('receipt-modal').classList.add('hidden');
+        }
+
+        // --- ADMIN FLEET MANAGEMENT RENDER ---
+        function renderAdminFleet() {
+            const container = document.getElementById('admin-fleet-grid');
+            container.innerHTML = fleet.map(bike => `
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold text-orange uppercase">${bike.id} • ${bike.type}</span>
+                            <h4 class="font-extrabold text-navy text-lg">${bike.model}</h4>
+                            <p class="text-xs text-slate-500">Reg: ${bike.regNo || 'MH-15-...'} | ${bike.year} | ${bike.color}</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${bike.status === 'Available' ? 'bg-success/10 text-success' : 'bg-amber/10 text-amber'}">${bike.status}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-center bg-lightgrey p-3 rounded-xl text-xs">
+                        <div><span class="text-slate-500 block font-bold">Daily</span><b>₹${bike.dailyRate}</b></div>
+                        <div><span class="text-slate-500 block font-bold">Weekly</span><b>₹${bike.weeklyRate}</b></div>
+                        <div><span class="text-slate-500 block font-bold">Monthly</span><b>₹${bike.monthlyRate}</b></div>
+                    </div>
+                    <button onclick="editBikeModal('${bike.id}')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold text-xs transition">
+                        Edit Bike Details & Rates
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function editBikeModal(bikeId) {
+            const bike = fleet.find(b => b.id === bikeId);
+            if (!bike) return;
+
+            const html = `
+                <div id="edit-bike-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+                        <h3 class="text-xl font-bold text-navy">Edit Bike: ${bike.id}</h3>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Registration No</label>
+                                <input type="text" id="edit-reg" value="${bike.regNo || ''}" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Daily Rate (₹)</label>
+                                <input type="number" id="edit-daily" value="${bike.dailyRate}" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Weekly Rate (₹)</label>
+                                <input type="number" id="edit-weekly" value="${bike.weeklyRate}" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Monthly Rate (₹)</label>
+                                <input type="number" id="edit-monthly" value="${bike.monthlyRate}" class="w-full bg-lightgrey border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium">
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                            <button onclick="document.getElementById('edit-bike-modal').remove()" class="px-4 py-2.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-700">Cancel</button>
+                            <button onclick="saveBikeEdit('${bike.id}')" class="px-5 py-2.5 bg-orange hover:bg-orange-hover text-white rounded-xl text-xs font-bold shadow">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+
+        function saveBikeEdit(bikeId) {
+            const bike = fleet.find(b => b.id === bikeId);
+            if (!bike) return;
+
+            bike.regNo = document.getElementById('edit-reg').value;
+            bike.dailyRate = parseFloat(document.getElementById('edit-daily').value);
+            bike.weeklyRate = parseFloat(document.getElementById('edit-weekly').value);
+            bike.monthlyRate = parseFloat(document.getElementById('edit-monthly').value);
+
+            saveState();
+            document.getElementById('edit-bike-modal').remove();
+            showToast(`Bike ${bikeId} updated successfully!`, 'success');
+            renderAdminFleet();
+            renderExploreFleet();
+        }
+
+        // --- ADMIN FINANCIAL REPORTS RENDER ---
+        function renderAdminFinance() {
+            const completed = bookings.filter(b => b.status === 'Completed');
+            const totalRev = completed.reduce((sum, b) => sum + b.amount, 0);
+            const totalDepositsHeld = bookings.filter(b => b.status === 'Active').reduce((sum, b) => sum + b.deposit, 0);
+
+            document.getElementById('fin-total-rev').innerText = `₹${totalRev}`;
+            document.getElementById('fin-total-deposits').innerText = `₹${totalDepositsHeld}`;
+            document.getElementById('fin-net-income').innerText = `₹${totalRev}`;
+
+            const tbody = document.getElementById('finance-ledger-tbody');
+            if (completed.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No completed rental transactions yet.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = completed.map(b => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-navy">${b.id}</td>
+                    <td class="p-3">${b.customerName}</td>
+                    <td class="p-3">${b.bikeModel}</td>
+                    <td class="p-3 font-bold text-success">₹${b.amount}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600">${b.depositStatus}</span></td>
+                    <td class="p-3 text-xs">${b.completedAt || 'N/A'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function exportFinancialCSV() {
+            const completed = bookings.filter(b => b.status === 'Completed');
+            let csv = 'BookingID,Customer,Mobile,BikeModel,Amount,DepositStatus,CompletedAt\n';
+            completed.forEach(b => {
+                csv += `${b.id},"${b.customerName}",${b.customerMobile},"${b.bikeModel}",${b.amount},${b.depositStatus},"${b.completedAt}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'bike_rentals_nashik_revenue.csv');
+            a.click();
+            showToast('Financial CSV report downloaded successfully!', 'success');
+        }
+
+        // --- ADMIN DEPOSITS RENDER ---
+        function renderAdminDeposits() {
+            const container = document.getElementById('admin-deposits-list');
+            const activeOrCompleted = bookings.filter(b => b.status === 'Active' || b.status === 'Completed');
+
+            if (activeOrCompleted.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">No deposit records found.</p>`;
+                return;
+            }
+
+            container.innerHTML = activeOrCompleted.map(b => `
+                <div class="bg-lightgrey p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border border-slate-200 text-sm">
+                    <div>
+                        <span class="text-xs font-bold text-orange">${b.id} • ${b.customerName} (${b.customerMobile})</span>
+                        <h4 class="font-bold text-navy">${b.bikeModel}</h4>
+                        <span class="text-xs text-slate-500">Deposit Amount: ₹${b.deposit}</span>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold ${b.depositStatus === 'Refunded' ? 'bg-success/10 text-success' : 'bg-amber/10 text-amber'}">${b.depositStatus}</span>
+                </div>
+            `).join('');
+        }
+
+        // --- ADMIN SUPPORT TICKETS RENDER ---
+        function renderAdminSupport() {
+            const container = document.getElementById('admin-support-list');
+            if (supportTickets.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">No support tickets submitted.</p>`;
+                return;
+            }
+
+            container.innerHTML = supportTickets.map(t => `
+                <div class="bg-lightgrey p-4 rounded-2xl border border-slate-200 space-y-2 text-sm">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-navy">${t.id} • ${t.name} (${t.mobile})</span>
+                        <span class="text-xs text-slate-500">${t.date}</span>
+                    </div>
+                    <p class="text-slate-700 bg-white p-3 rounded-xl border border-slate-200">${t.message}</p>
+                </div>
+            `).join('');
+        }
+
+        function saveGlobalSettings(e) {
+            e.preventDefault();
+            showToast('Global settings updated successfully!', 'success');
+        }
+
+        // --- INITIALIZATION ON LOAD ---
+        function initApp() {
+            renderHomeFleet();
+            renderExploreFleet();
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
